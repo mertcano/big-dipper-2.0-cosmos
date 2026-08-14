@@ -68,7 +68,7 @@ ENV TURBO_TOKEN=${TURBO_TOKEN}
 
 RUN --mount=type=secret,id=sentry_auth_token,required=false \
     if [ -f /run/secrets/sentry_auth_token ]; then SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token) && export SENTRY_AUTH_TOKEN; fi \
-  && export SENTRYCLI_SKIP_DOWNLOAD=$([ -z "${NEXT_PUBLIC_SENTRY_DSN}" ] && echo 1) \
+  && export SENTRYCLI_SKIP_DOWNLOAD="$([ -z "${NEXT_PUBLIC_SENTRY_DSN}" ] && echo 1)" \
   && corepack enable && yarn -v \
   && yarn install --inline-builds
 
