@@ -53,7 +53,6 @@ ARG NEXT_PUBLIC_WC_BRIDGE_URL
 ENV NEXT_PUBLIC_WC_BRIDGE_URL=${NEXT_PUBLIC_WC_BRIDGE_URL}
 ARG NEXT_PUBLIC_SENTRY_DSN
 ENV NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN}
-
 ENV SENTRY_URL=https://sentry.io/
 ENV SENTRY_ORG=forbole
 ENV SENTRY_PROJECT=big-dipper
@@ -68,14 +67,14 @@ ARG TURBO_TOKEN
 ENV TURBO_TOKEN=${TURBO_TOKEN}
 
 RUN --mount=type=secret,id=sentry_auth_token,required=false \
-  if [ -f /run/secrets/sentry_auth_token ]; then export SENTRY_AUTH_TOKEN="$(cat /run/secrets/sentry_auth_token)"; fi \
+    if [ -f /run/secrets/sentry_auth_token ]; then SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token) && export SENTRY_AUTH_TOKEN; fi \
   && export SENTRYCLI_SKIP_DOWNLOAD=$([ -z "${NEXT_PUBLIC_SENTRY_DSN}" ] && echo 1) \
   && corepack enable && yarn -v \
   && yarn install --inline-builds
 
 ## Build the project
 RUN --mount=type=secret,id=sentry_auth_token,required=false \
-  if [ -f /run/secrets/sentry_auth_token ]; then export SENTRY_AUTH_TOKEN="$(cat /run/secrets/sentry_auth_token)"; fi \
+    if [ -f /run/secrets/sentry_auth_token ]; then SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token) && export SENTRY_AUTH_TOKEN; fi \
   && ([ -z "${NEXT_PUBLIC_SENTRY_DSN}" ] || yarn node packages/shared-utils/configs/sentry/install.js) \
   && yarn workspace ${PROJECT_NAME} add sharp \
   && yarn workspace ${PROJECT_NAME} run build
